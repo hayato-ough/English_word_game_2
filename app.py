@@ -1,111 +1,97 @@
 import streamlit as st
 import random
 
-# 1. Ensure the `words` list is defined and globally accessible.
-words = [
-    {"en": "hello", "jp" : "こんにちは"},
-    {"en": "bye", "jp" : "さようなら"},
-    {"en": "thank you", "jp" : "ありがとう"},
-    {"en": "disgusting", "jp": "気持ち悪い"},
-    {"en": "yes", "jp" : "はい"},
-    {"en": "no", "jp" : "いいえ"},
-    {"en": "please", "jp" : "お願いします"},
-    {"en": "excuse me", "jp" : "すみません"},
-    {"en": "water", "jp" : "水"},
-    {"en": "food", "jp" : "食べ物"},
-    {"en": "book", "jp" : "本"},
-    {"en": "cat", "jp" : "猫"},
-    {"en": "dog", "jp" : "犬"},
-    {"en": "apple", "jp" : "りんご"},
-    {"en": "teacher", "jp" : "先生"},
-    {"en": "student", "jp" : "生徒"}
-]
+# 1. クイズデータの準備（単語を自由に追加できます）
+# 辞書形式で { "英単語": "日本語訳" } を用意します
+WORD_DATA = {
+    "Apple": "りんご", "Banana": "バナナ", "Cat": "猫", "Dog": "犬",
+    "Elephant": "象", "Flower": "花", "Guitar": "ギター", "House": "家",
+    "Island": "島", "Journey": "旅", "Knowledge": "知識", "Library": "図書館",
+    "Mountain": "山", "Nature": "自然", "Ocean": "海", "Pencil": "鉛筆",
+    "Queen": "女王", "River": "川", "Sun": "太陽", "Tree": "木",
+    "Umbrella": "傘", "Village": "村", "Window": "窓", "Xylophone": "木琴",
+    "Yellow": "黄色", "Zebra": "シマウマ", "Beautiful": "美しい", "Challenge": "挑戦",
+    "Development": "開発", "Education": "教育", "Future": "未来", "Global": "世界的な",
+    "Happiness": "幸せ", "Important": "重要な", "Justice": "正義", "Kitchen": "台所",
+    "Language": "言語", "Memory": "記憶", "Notebook": "ノート", "Opportunity": "機会",
+    "Practice": "練習", "Quality": "品質", "Respect": "尊敬", "Success": "成功",
+    "Technology": "技術", "Universe": "宇宙", "Victory": "勝利", "Weather": "天気",
+    "Young": "若い", "Zone": "地域"
+}
 
-# Initialize session state variables if they don't exist
-# This ensures game state persists across reruns
-if 'game_started' not in st.session_state:
-    st.session_state.game_started = False
-if 'current_word_pair' not in st.session_state:
-    st.session_state.current_word_pair = None
-if 'choices' not in st.session_state:
-    st.session_state.choices = []
-if 'score' not in st.session_state:
+# 2. セッション状態（データの保持）の初期化
+# Streamlitは操作のたびにコードが上から再実行されるため、
+# 現在の問題やスコアを st.session_state に保存して記憶させます。
+if 'current_word' not in st.session_state:
+    st.session_state.current_word = None
+    st.session_state.options = []
     st.session_state.score = 0
-if 'question_number' not in st.session_state:
-    st.session_state.question_number = 0
-if 'feedback' not in st.session_state:
-    st.session_state.feedback = ''
+    st.session_state.total = 0
+    st.session_state.answered = False
+    st.session_state.feedback = ""
 
-# 2. Review `generate_new_question` function
-def generate_new_question():
-    selected_word_pair = random.choice(words)
-    correct_japanese = selected_word_pair["jp"]
+def next_question():
+    """新しい問題を作成する関数"""
+    # 全単語からランダムに1つ正解を選ぶ
+    word = random.choice(list(WORD_DATA.keys()))
+    correct_ans = WORD_DATA[word]
+    
+    # 不正解の選択肢を3つ選ぶ（正解を除いたリストからランダム抽出）
+    others = [v for v in WORD_DATA.values() if v != correct_ans]
+    wrong_answers = random.sample(others, 3)
+    
+    # 正解と不正解を混ぜてリストにする
+    options = [correct_ans] + wrong_answers
+    random.shuffle(options)
+    
+    # 状態を更新
+    st.session_state.current_word = word
+    st.session_state.options = options
+    st.session_state.answered = False
+    st.session_state.feedback = ""
 
-    all_japanese_words = [d["jp"] for d in words]
-    incorrect_options = [jp for jp in all_japanese_words if jp != correct_japanese]
-    random.shuffle(incorrect_options)
+# 初回実行時のみ問題を生成
+if st.session_state.current_word is None:
+    next_question()
 
-    num_choices = min(len(incorrect_options), 2) # Get up to 2 incorrect options
-    chosen_incorrect_options = random.sample(incorrect_options, num_choices)
+# 3. アプリの画面構成
+st.title("🔤 英単語 4択クイズ")
 
-    choices = chosen_incorrect_options + [correct_japanese]
-    random.shuffle(choices)
+# スコア表示
+st.sidebar.write(f"### スコア: {st.session_state.score} / {st.session_state.total}")
 
-    st.session_state.current_word_pair = selected_word_pair
-    st.session_state.choices = choices
-    st.session_state.question_number += 1
-    st.session_state.feedback = '' # Clear previous feedback
+# 問題の表示
+st.write("---")
+st.write(f"### 次の単語の意味は何ですか？")
+st.header(f"**{st.session_state.current_word}**")
 
-# 3. Review `process_answer` function
-def process_answer(selected_choice):
-    correct_japanese = st.session_state.current_word_pair["jp"]
-
-    if selected_choice == correct_japanese:
-        st.session_state.feedback = f"正解です！ '{st.session_state.current_word_pair['en']}' は '{correct_japanese}' です。"
-        st.session_state.score += 1
-    else:
-        st.session_state.feedback = f"不正解です。'{st.session_state.current_word_pair['en']}' の正解は '{correct_japanese}' でした。"
-
-    generate_new_question()
-
-
-# 4. Verify main Streamlit application logic
-st.title("英単語暗記ゲーム")
-
-if not st.session_state.game_started:
-    st.subheader("Streamlit版にようこそ！")
-    st.write("下のボタンを押してゲームを開始してください。")
-    if st.button("ゲーム開始"): # This button will also reset the game if re-run
-        st.session_state.game_started = True
-        st.session_state.score = 0
-        st.session_state.question_number = 0
-        st.session_state.feedback = ''
-        generate_new_question()
-        st.rerun() # Rerun to display the first question
-
-if st.session_state.game_started:
-    st.write(f"スコア: {st.session_state.score}")
-    st.write(f"問題 {st.session_state.question_number}")
-
-    if st.session_state.current_word_pair:
-        st.write(f"### 問題: {st.session_state.current_word_pair['en']} の日本語訳は何ですか？")
-
-        # Display choices as buttons. Streamlit reruns the script on button click.
-        for i, choice in enumerate(st.session_state.choices):
-            # A unique key is crucial for Streamlit buttons within a loop
-            if st.button(f"{i+1}. {choice}", key=f"choice_{st.session_state.question_number}_{i}"):
-                process_answer(choice)
-                st.rerun() # Rerun to update the question and feedback
-
-    if st.session_state.feedback:
-        st.info(st.session_state.feedback)
-
-    # Add a restart button while the game is ongoing
-    if st.button("ゲームをリスタート"): # Reset game_started to false to show the initial start button
-        st.session_state.game_started = False
-        st.session_state.score = 0
-        st.session_state.question_number = 0
-        st.session_state.feedback = ''
-        st.session_state.current_word_pair = None
-        st.session_state.choices = []
+# 選択肢ボタンの配置
+for option in st.session_state.options:
+    # ボタンが押された時の処理
+    if st.button(option, key=option, use_container_width=True, disabled=st.session_state.answered):
+        st.session_state.answered = True
+        st.session_state.total += 1
+        
+        # 正誤判定
+        if option == WORD_DATA[st.session_state.current_word]:
+            st.session_state.score += 1
+            st.session_state.feedback = "⭕ 正解！"
+        else:
+            st.session_state.feedback = f"❌ 残念！正解は「{WORD_DATA[st.session_state.current_word]}」でした。"
+        
+        # 画面をリフレッシュして結果を表示
         st.rerun()
+
+# 結果と次の問題へのボタン
+if st.session_state.answered:
+    st.subheader(st.session_state.feedback)
+    if st.button("次の問題へ ➡️"):
+        next_question()
+        st.rerun()
+
+# リセットボタン
+if st.sidebar.button("スコアをリセット"):
+    st.session_state.score = 0
+    st.session_state.total = 0
+    next_question()
+    st.rerun()
