@@ -1,73 +1,540 @@
 import streamlit as st
 import random
 
-# 1. 語彙データの準備（英検準一級レベル + 例文）
-# 構造: "単語": {"meaning": "意味", "example": "例文"}
+# 1. 語彙データの拡充（英検準1級レベル 約400語）
 EIKEN_PRE1_DATA = {
-    "Abundant": {
-        "meaning": "豊富な、潤沢な",
-        "example": "The region is abundant in natural resources like gold and copper."
-    },
-    "Adjacent": {
-        "meaning": "隣接した、近隣の",
-        "example": "The school is located adjacent to a large public park."
-    },
-    "Coincide": {
-        "meaning": "同時に起こる、一致する",
-        "example": "My vacation plans coincide with my brother's wedding."
-    },
-    "Deteriorate": {
-        "meaning": "悪化する、低下する",
-        "example": "The weather conditions began to deteriorate rapidly after sunset."
-    },
-    "Eliminate": {
-        "meaning": "排除する、除去する",
-        "example": "We need to eliminate unnecessary expenses to save money."
-    },
-    "Feasible": {
-        "meaning": "実行可能な、実現可能な",
-        "example": "The committee is checking if the new project is financially feasible."
-    },
-    "Inevitably": {
-        "meaning": "必然的に、避けられないことに",
-        "example": "Technological progress inevitably leads to changes in our lifestyle."
-    },
-    "Magnificent": {
-        "meaning": "壮大な、見事な",
-        "example": "The view from the top of the mountain was absolutely magnificent."
-    },
-    "Obscure": {
-        "meaning": "曖昧な、世に知られていない",
-        "example": "The origins of the manuscript remain obscure to this day."
-    },
-    "Prevalent": {
-        "meaning": "普及している、一般的な",
-        "example": "Flu infections are more prevalent during the winter months."
-    },
-    "Reluctant": {
-        "meaning": "気が進まない、渋っている",
-        "example": "She was reluctant to admit that she had made a mistake."
-    },
-    "Substantial": {
-        "meaning": "かなりの、実質的な",
-        "example": "The company reported a substantial increase in profits this year."
-    },
+    "Abundant": {"meaning": "豊富な、潤沢な", "example": "The region is abundant in natural resources."},
+    "Adjacent": {"meaning": "隣接した", "example": "The school is located adjacent to a park."},
+    "Coincide": {"meaning": "同時に起こる", "example": "My vacation plans coincide with his wedding."},
+    "Deteriorate": {"meaning": "悪化する", "example": "The weather began to deteriorate rapidly."},
+    "Eliminate": {"meaning": "排除する", "example": "We need to eliminate unnecessary expenses."},
+    "Feasible": {"meaning": "実行可能な", "example": "The project is financially feasible."},
+    "Inevitably": {"meaning": "必然的に", "example": "Technological progress inevitably leads to change."},
+    "Magnificent": {"meaning": "壮大な", "example": "The view from the top was magnificent."},
+    "Obscure": {"meaning": "曖昧な、世に知られていない", "example": "The origins of the manuscript remain obscure."},
+    "Prevalent": {"meaning": "普及している", "example": "Flu is more prevalent during winter."},
+    "Reluctant": {"meaning": "気が進まない", "example": "She was reluctant to admit her mistake."},
+    "Substantial": {"meaning": "のかなりの、実質的な", "example": "The company reported a substantial profit."},
+    "Accommodate": {"meaning": "収容する、適応させる", "example": "The hotel can accommodate up to 500 guests."},
+    "Acknowledge": {"meaning": "認める、承認する", "example": "He acknowledged that he had made a mistake."},
+    "Acquire": {"meaning": "習得する、取得する", "example": "She acquired a new language in just six months."},
+    "Advocate": {"meaning": "提唱する、支持者", "example": "He is a strong advocate for human rights."},
+    "Affordable": {"meaning": "手頃な価格の", "example": "The company sells high-quality, affordable clothing."},
+    "Ambiguous": {"meaning": "曖昧な、多義的な", "example": "The instructions were ambiguous and confusing."},
+    "Brief": {"meaning": "簡潔な、短い", "example": "The meeting was very brief."},
+    "Coherent": {"meaning": "筋の通った、一致した", "example": "He failed to provide a coherent explanation."},
+    "Compensate": {"meaning": "補償する、埋め合わせる", "example": "The company compensated him for his injuries."},
+    "Crucial": {"meaning": "極めて重要な", "example": "Vitamin C plays a crucial role in our health."},
+    "Depict": {"meaning": "描く、描写する", "example": "The painting depicts a scene from the war."},
+    "Distinguish": {"meaning": "区別する、見分ける", "example": "It's hard to distinguish between the two colors."},
+    "Embrace": {"meaning": "受け入れる、抱擁する", "example": "The company embraced the new technology."},
+    "Exaggerate": {"meaning": "誇張する", "example": "Don't exaggerate; it wasn't that bad."},
+    "Implement": {"meaning": "実行する、実施する", "example": "The new policy will be implemented next month."},
+    "Incentive": {"meaning": "動機、刺激", "example": "The bonus serves as an incentive to work harder."},
+    "Modify": {"meaning": "修正する、変える", "example": "We need to modify the plan slightly."},
+    "Sustain": {"meaning": "維持する、支える", "example": "He ate enough food to sustain his energy."},
+    "Abandon": {"meaning": "捨てる、断念する", "example": "The search was abandoned due to bad weather."},
+    "Abrupt": {"meaning": "突然の、ぶっきらぼうな", "example": "The meeting came to an abrupt end."},
+    "Abstract": {"meaning": "抽象的な", "example": "Truth and justice are abstract concepts."},
+    "Absurd": {"meaning": "不条理な、ばかげた", "example": "It is absurd to suggest that he is a spy."},
+    "Abuse": {"meaning": "虐待、乱用", "example": "Drug abuse is a serious problem in the city."},
+    "Academic": {"meaning": "学問的な、大学の", "example": "She has a brilliant academic record."},
+    "Accelerate": {"meaning": "加速させる", "example": "The government is trying to accelerate economic growth."},
+    "Accessible": {"meaning": "近づきやすい、利用可能な", "example": "The building is accessible to wheelchair users."},
+    "Accomplish": {"meaning": "成し遂げる", "example": "We have accomplished a lot today."},
+    "Accumulate": {"meaning": "蓄積する", "example": "Dust soon accumulates if you don't clean."},
+    "Accurate": {"meaning": "正確な", "example": "The map was not very accurate."},
+    "Accuse": {"meaning": "非難する、告訴する", "example": "He was accused of stealing the money."},
+    "Accustomed": {"meaning": "慣れている", "example": "I am accustomed to getting up early."},
+    "Achievement": {"meaning": "達成、業績", "example": "Winning the prize was a great achievement."},
+    "Acid": {"meaning": "酸性の、酸", "example": "Lemon juice contains citric acid."},
+    "Actively": {"meaning": "積極的に", "example": "She is actively involved in local politics."},
+    "Adapt": {"meaning": "適応させる、順応する", "example": "It took him time to adapt to the new environment."},
+    "Adequate": {"meaning": "十分な、適切な", "example": "The food was adequate for our needs."},
+    "Adjust": {"meaning": "調整する、適合させる", "example": "You can adjust the height of the chair."},
+    "Administration": {"meaning": "管理、運営、行政", "example": "The school administration is very efficient."},
+    "Admiration": {"meaning": "賞賛、感嘆", "example": "I have great admiration for her courage."},
+    "Adolescent": {"meaning": "思春期の、若者", "example": "Adolescent behavior can be unpredictable."},
+    "Adopt": {"meaning": "採用する、養子にする", "example": "They decided to adopt a child."},
+    "Advance": {"meaning": "進歩、前進", "example": "Medical advances have saved many lives."},
+    "Adverse": {"meaning": "逆境の、不運な、有害な", "example": "The flight was cancelled due to adverse weather conditions."},
+    "Advertisement": {"meaning": "広告", "example": "I saw an advertisement for a new car."},
+    "Affair": {"meaning": "事柄、問題", "example": "The minister's resignation was a major affair."},
+    "Affect": {"meaning": "影響を及ぼす", "example": "The noise affected my concentration."},
+    "Affluent": {"meaning": "富裕な", "example": "He lives in an affluent neighborhood."},
+    "Agenda": {"meaning": "協議事項、予定表", "example": "The next item on the agenda is the budget."},
+    "Aggressive": {"meaning": "攻撃的な、積極的な", "example": "He has an aggressive management style."},
+    "Agriculture": {"meaning": "農業", "example": "Agriculture is the main industry in this region."},
+    "Alert": {"meaning": "油断のない、警告する", "example": "The pilot was alert to the danger."},
+    "Alien": {"meaning": "外国の、異質の、宇宙人", "example": "The idea is alien to our culture."},
+    "Alliance": {"meaning": "同盟、提携", "example": "The two companies formed a strategic alliance."},
+    "Allocate": {"meaning": "配分する、割り当てる", "example": "The government allocated funds for the project."},
+    "Alter": {"meaning": "変える、作り変える", "example": "The dress was too long, so I had to alter it."},
+    "Alternative": {"meaning": "代わりの、選択肢", "example": "There is no alternative to the plan."},
+    "Amateur": {"meaning": "素人の、アマチュア", "example": "He is an amateur photographer."},
+    "Ambition": {"meaning": "野心、抱負", "example": "His ambition is to become a doctor."},
+    "Amend": {"meaning": "修正する、改正する", "example": "The law was amended to include new regulations."},
+    "Ample": {"meaning": "十分な、広い", "example": "There is ample parking space available."},
+    "Analogy": {"meaning": "類推、似ていること", "example": "She drew an analogy between the brain and a computer."},
+    "Analyze": {"meaning": "分析する", "example": "Scientists are analyzing the data."},
+    "Ancestor": {"meaning": "先祖", "example": "My ancestors came from Italy."},
+    "Anchor": {"meaning": "いかり、頼みの綱", "example": "The ship dropped anchor in the bay."},
+    "Ancient": {"meaning": "古代の、昔の", "example": "Rome is an ancient city."},
+    "Anecdote": {"meaning": "逸話", "example": "He told us a funny anecdote about his trip."},
+    "Anguish": {"meaning": "苦悩、激痛", "example": "She suffered great anguish over the loss of her dog."},
+    "Anniversary": {"meaning": "記念日", "example": "They celebrated their 10th wedding anniversary."},
+    "Annual": {"meaning": "毎年の、例年の", "example": "The company holds an annual meeting."},
+    "Anticipate": {"meaning": "予期する、楽しみに待つ", "example": "We anticipate that the project will be successful."},
+    "Anxiety": {"meaning": "不安、心配", "example": "There is growing anxiety about the economy."},
+    "Apologetic": {"meaning": "謝罪の、申し訳なさそうな", "example": "He was very apologetic for being late."},
+    "Apparatus": {"meaning": "装置、器具", "example": "The laboratory is equipped with modern apparatus."},
+    "Apparent": {"meaning": "明らかな、外見上の", "example": "It was apparent that she was unhappy."},
+    "Appeal": {"meaning": "訴える、魅力", "example": "The police appealed for witnesses to come forward."},
+    "Applaud": {"meaning": "拍手する、賞賛する", "example": "The audience applauded loudly at the end of the show."},
+    "Applicable": {"meaning": "適用できる、妥当な", "example": "The rules are not applicable in this case."},
+    "Applicant": {"meaning": "志願者、応募者", "example": "There were over 100 applicants for the job."},
+    "Appoint": {"meaning": "任命する、指定する", "example": "She was appointed as the new manager."},
+    "Appraisal": {"meaning": "評価、鑑定", "example": "The manager gave her a positive performance appraisal."},
+    "Appreciate": {"meaning": "正しく評価する、感謝する", "example": "I really appreciate your help."},
+    "Apprehend": {"meaning": "逮捕する、理解する", "example": "The police apprehended the suspect."},
+    "Approach": {"meaning": "近づく、手法", "example": "Winter is fast approaching."},
+    "Appropriate": {"meaning": "適切な", "example": "Is this film appropriate for children?"},
+    "Approval": {"meaning": "承認、賛成", "example": "The plan has received official approval."},
+    "Approximate": {"meaning": "おおよその", "example": "The approximate cost of the trip is $500."},
+    "Aptitude": {"meaning": "才能、適性", "example": "She has an aptitude for learning languages."},
+    "Arbitrary": {"meaning": "任意の、独断的な", "example": "The decision was completely arbitrary."},
+    "Architecture": {"meaning": "建築、構造", "example": "The city is famous for its modern architecture."},
+    "Ardent": {"meaning": "熱烈な", "example": "He is an ardent supporter of the team."},
+    "Arise": {"meaning": "生じる、起こる", "example": "Problems often arise from misunderstandings."},
+    "Aristocracy": {"meaning": "貴族政治、貴族階級", "example": "He was born into the French aristocracy."},
+    "Arouse": {"meaning": "刺激する、目覚めさせる", "example": "The book aroused my interest in history."},
+    "Array": {"meaning": "勢ぞろい、配列", "example": "The shop has a vast array of goods."},
+    "Arrogant": {"meaning": "傲慢な", "example": "He is so arrogant that he never listens to others."},
+    "Artifact": {"meaning": "工芸品、人工遺物", "example": "The museum houses many ancient artifacts."},
+    "Artificial": {"meaning": "人工的な", "example": "The flowers are made of artificial silk."},
+    "Aspect": {"meaning": "側面、様相", "example": "We must consider every aspect of the problem."},
+    "Aspiration": {"meaning": "熱望、志", "example": "She has aspirations to become a professional singer."},
+    "Assault": {"meaning": "暴行、攻撃", "example": "He was charged with sexual assault."},
+    "Assemble": {"meaning": "集める、組み立てる", "example": "The students assembled in the hall."},
+    "Assert": {"meaning": "断言する、主張する", "example": "She continued to assert her innocence."},
+    "Assess": {"meaning": "評価する、査定する", "example": "It's difficult to assess the damage."},
+    "Asset": {"meaning": "資産、利点", "example": "A good memory is a great asset."},
+    "Assign": {"meaning": "割り当てる、任命する", "example": "The teacher assigned us a lot of homework."},
+    "Assimilate": {"meaning": "同化する、吸収する", "example": "It takes time to assimilate a new culture."},
+    "Assist": {"meaning": "助ける、手伝う", "example": "The nurse assisted the doctor with the surgery."},
+    "Associate": {"meaning": "連想する、仲間", "example": "I always associate smell with memories."},
+    "Assume": {"meaning": "仮定する、引き受ける", "example": "Let's assume that the story is true."},
+    "Assurance": {"meaning": "確信、保証", "example": "He gave me his assurance that he would help."},
+    "Astonish": {"meaning": "驚かせる", "example": "The news astonished everyone."},
+    "Astound": {"meaning": "びっくり仰天させる", "example": "His performance astounded the audience."},
+    "Attachment": {"meaning": "愛着、添付ファイル", "example": "The child has a strong attachment to his mother."},
+    "Attain": {"meaning": "達成する、到達する", "example": "She attained a high level of fitness."},
+    "Attempt": {"meaning": "試みる、試み", "example": "He attempted to break the world record."},
+    "Attentive": {"meaning": "注意深い、思いやりのある", "example": "The staff were very attentive to our needs."},
+    "Attitude": {"meaning": "態度、考え方", "example": "He has a very positive attitude toward work."},
+    "Attribute": {"meaning": "特質、〜のせいにする", "example": "She attributes her success to hard work."},
+    "Auction": {"meaning": "競売、オークション", "example": "The painting was sold at an auction."},
+    "Audible": {"meaning": "聞こえる", "example": "Her voice was barely audible."},
+    "Authentic": {"meaning": "本物の、信頼できる", "example": "The restaurant serves authentic Italian food."},
+    "Authoritative": {"meaning": "権威のある、威圧的な", "example": "He spoke in an authoritative tone."},
+    "Authority": {"meaning": "権威、権限", "example": "He is an authority on Roman history."},
+    "Authorize": {"meaning": "許可する、権限を与える", "example": "The manager authorized the expenditure."},
+    "Autonomy": {"meaning": "自治、自主性", "example": "The region was granted autonomy."},
+    "Availability": {"meaning": "利用可能性", "example": "The availability of fresh water is a major concern."},
+    "Average": {"meaning": "平均、平均の", "example": "The average age of the students is 20."},
+    "Avert": {"meaning": "そらす、避ける", "example": "A disaster was narrowly averted."},
+    "Aviation": {"meaning": "航空、飛行", "example": "The aviation industry is facing a crisis."},
+    "Avoidance": {"meaning": "回避", "example": "The avoidance of tax is not illegal."},
+    "Await": {"meaning": "待つ", "example": "We are awaiting your reply."},
+    "Award": {"meaning": "賞、授与する", "example": "He won an award for his bravery."},
+    "Awareness": {"meaning": "自覚、意識", "example": "Environmental awareness is increasing."},
+    "Awful": {"meaning": "ひどい、恐ろしい", "example": "The weather was awful yesterday."},
+    "Backtrack": {"meaning": "引き返す、撤回する", "example": "The government has backtracked on its promise."},
+    "Baffle": {"meaning": "困惑させる", "example": "The puzzle baffled me for hours."},
+    "Balance": {"meaning": "バランス、残高", "example": "I need to check my bank balance."},
+    "Ban": {"meaning": "禁止する、禁止", "example": "Smoking is banned in public places."},
+    "Barren": {"meaning": "不毛の、実を結ばない", "example": "The land was barren and dry."},
+    "Barrier": {"meaning": "障壁、障害", "example": "Language can be a barrier to communication."},
+    "Base": {"meaning": "土台、基礎", "example": "The lamp has a heavy base."},
+    "Basic": {"meaning": "基礎的な", "example": "They only have basic computer skills."},
+    "Behalf": {"meaning": "利益、味方", "example": "On behalf of the company, I'd like to thank you."},
+    "Behavior": {"meaning": "行動、挙動", "example": "His behavior at the party was terrible."},
+    "Belief": {"meaning": "信念、信頼", "example": "It is my belief that honesty is the best policy."},
+    "Beneficial": {"meaning": "有益な", "example": "Exercise is beneficial to your health."},
+    "Beneficiary": {"meaning": "受益者", "example": "He was the main beneficiary of his father's will."},
+    "Benefit": {"meaning": "利益、恩恵", "example": "The new law will benefit many people."},
+    "Benevolent": {"meaning": "慈悲深い、善意のある", "example": "The benevolent old man gave money to the poor."},
+    "Betray": {"meaning": "裏切る、漏らす", "example": "He betrayed his country by selling secrets."},
+    "Beverage": {"meaning": "飲料", "example": "Hot beverages are served in the cafe."},
+    "Beware": {"meaning": "用心する", "example": "Beware of the dog!"},
+    "Bias": {"meaning": "偏見、偏り", "example": "The report shows a bias against small businesses."},
+    "Bibliography": {"meaning": "参考文献一覧", "example": "Include a bibliography at the end of your essay."},
+    "Bind": {"meaning": "縛る、拘束する", "example": "The contract binds us for three years."},
+    "Biodiversity": {"meaning": "生物多様性", "example": "The rainforest has a rich biodiversity."},
+    "Biography": {"meaning": "伝記", "example": "I'm reading a biography of Winston Churchill."},
+    "Biological": {"meaning": "生物学的な", "example": "The biological effects of radiation are serious."},
+    "Bizarre": {"meaning": "奇妙な", "example": "He has a bizarre sense of humor."},
+    "Blame": {"meaning": "非難する、責任を負わせる", "example": "Don't blame me for your mistakes."},
+    "Blast": {"meaning": "爆発、突風", "example": "The blast shattered all the windows."},
+    "Bleak": {"meaning": "暗い、荒涼とした", "example": "The future looks bleak for the company."},
+    "Blessing": {"meaning": "恵み、祝福", "example": "The rain was a blessing for the farmers."},
+    "Blockade": {"meaning": "封鎖", "example": "The navy set up a blockade of the port."},
+    "Bloom": {"meaning": "花が咲く、開花", "example": "The cherry blossoms are in full bloom."},
+    "Blossom": {"meaning": "花、開花する", "example": "The apple trees are covered in blossom."},
+    "Blunder": {"meaning": "大失敗", "example": "The government made a serious blunder."},
+    "Blur": {"meaning": "ぼやける、かすみ", "example": "The tears blurred her vision."},
+    "Boast": {"meaning": "自慢する", "example": "He is always boasting about his wealth."},
+    "Bold": {"meaning": "大胆な、不敵な", "example": "It was a bold move to change jobs now."},
+    "Bond": {"meaning": "絆、債券", "example": "There is a strong bond between the two brothers."},
+    "Bonus": {"meaning": "ボーナス、おまけ", "example": "All employees received a Christmas bonus."},
+    "Boom": {"meaning": "急成長、とどろき", "example": "There has been a boom in the housing market."},
+    "Boost": {"meaning": "高める、押し上げる", "example": "The news boosted the company's shares."},
+    "Boundary": {"meaning": "境界線", "example": "The river forms the boundary between the two countries."},
+    "Boycott": {"meaning": "不買運動", "example": "The group called for a boycott of the products."},
+    "Brag": {"meaning": "自慢する", "example": "Stop bragging about how much money you make."},
+    "Breach": {"meaning": "違反、侵害", "example": "They were sued for breach of contract."},
+    "Breakthrough": {"meaning": "飛躍的進歩", "example": "Scientists have made a major breakthrough in cancer research."},
+    "Breed": {"meaning": "飼育する、品種", "example": "What breed of dog is that?"},
+    "Bribe": {"meaning": "賄賂、賄賂を贈る", "example": "He was accused of trying to bribe a police officer."},
+    "Briefing": {"meaning": "状況説明、要旨", "example": "The general gave a briefing to the journalists."},
+    "Brilliant": {"meaning": "輝かしい、素晴らしい", "example": "He is a brilliant mathematician."},
+    "Brisk": {"meaning": "活発な、きびきびした", "example": "We took a brisk walk in the park."},
+    "Broaden": {"meaning": "広げる", "example": "Travel broadens the mind."},
+    "Browse": {"meaning": "閲覧する、拾い読みする", "example": "I spent the afternoon browsing in the library."},
+    "Bruise": {"meaning": "あざ、打撲傷", "example": "She had a large bruise on her leg."},
+    "Brutal": {"meaning": "残酷な、野蛮な", "example": "The attack was described as brutal."},
+    "Budget": {"meaning": "予算", "example": "The government has announced its budget for next year."},
+    "Bulk": {"meaning": "大部分、かさ", "example": "The bulk of the work is already done."},
+    "Bulletin": {"meaning": "掲示、速報", "example": "I saw the news bulletin on TV."},
+    "Bully": {"meaning": "いじめる、いじめっ子", "example": "He was bullied at school."},
+    "Burden": {"meaning": "負担、荷物", "example": "The cost of the project is a heavy burden."},
+    "Bureaucracy": {"meaning": "官僚政治、役所仕事", "example": "He complained about the government bureaucracy."},
+    "Burial": {"meaning": "埋葬", "example": "The burial took place in the local cemetery."},
+    "Cabin": {"meaning": "小屋、客室", "example": "We stayed in a small cabin in the mountains."},
+    "Calamity": {"meaning": "災難、不幸", "example": "The earthquake was a great calamity for the city."},
+    "Calculate": {"meaning": "計算する", "example": "We need to calculate the cost of the repairs."},
+    "Campaign": {"meaning": "運動、キャンペーン", "example": "The group launched a campaign against smoking."},
+    "Candidate": {"meaning": "候補者", "example": "There are three candidates for the position."},
+    "Canvas": {"meaning": "キャンバス、帆布", "example": "The artist painted on a large canvas."},
+    "Capable": {"meaning": "能力がある", "example": "She is a very capable teacher."},
+    "Capacity": {"meaning": "容量、能力", "example": "The stadium has a seating capacity of 50,000."},
+    "Captivate": {"meaning": "魅了する", "example": "The audience was captivated by her performance."},
+    "Capture": {"meaning": "捕らえる", "example": "The police captured the escaped prisoner."},
+    "Carefree": {"meaning": "気楽な、のんきな", "example": "She had a carefree childhood."},
+    "Cargo": {"meaning": "貨物", "example": "The ship was carrying a cargo of grain."},
+    "Carnivore": {"meaning": "肉食動物", "example": "Lions are carnivores."},
+    "Casual": {"meaning": "何気ない、カジュアルな", "example": "He made a casual remark about the weather."},
+    "Casualty": {"meaning": "死傷者、犠牲者", "example": "There were many casualties in the accident."},
+    "Catastrophe": {"meaning": "大惨事、破滅", "example": "The war was a catastrophe for the whole country."},
+    "Category": {"meaning": "範疇、カテゴリー", "example": "The books are divided into several categories."},
+    "Cater": {"meaning": "料理をまかなう、要望に応える", "example": "The restaurant caters for all tastes."},
+    "Caution": {"meaning": "用心、警告", "example": "The police advised caution when walking alone at night."},
+    "Cease": {"meaning": "やめる、終わる", "example": "The company ceased production of the car."},
+    "Celebrate": {"meaning": "祝う", "example": "We celebrated her birthday with a party."},
+    "Celebrity": {"meaning": "有名人、名声", "example": "She is a famous Hollywood celebrity."},
+    "Cemetery": {"meaning": "墓地", "example": "My grandfather is buried in the local cemetery."},
+    "Censor": {"meaning": "検閲する、検閲官", "example": "The government censors the news."},
+    "Census": {"meaning": "国勢調査", "example": "The census is taken every ten years."},
+    "Central": {"meaning": "中心の、主要な", "example": "The hotel is in a central location."},
+    "Century": {"meaning": "1世紀、100年", "example": "The church was built in the 12th century."},
+    "Ceremony": {"meaning": "儀式、式典", "example": "The opening ceremony will be held tomorrow."},
+    "Certainty": {"meaning": "確実性、確信", "example": "There is no certainty that the plan will work."},
+    "Certificate": {"meaning": "証明書", "example": "He was awarded a certificate of merit."},
+    "Challenge": {"meaning": "挑戦、課題", "example": "Learning a new language is a challenge."},
+    "Chamber": {"meaning": "部屋、会議場", "example": "The judge met the lawyers in his chambers."},
+    "Champion": {"meaning": "王者、擁護する", "example": "She is the reigning world champion."},
+    "Chaos": {"meaning": "混沌、無秩序", "example": "The meeting ended in total chaos."},
+    "Characteristic": {"meaning": "特徴、特有の", "example": "What are the characteristics of this plant?"},
+    "Charity": {"meaning": "慈善、慈善団体", "example": "He gave a lot of money to charity."},
+    "Charm": {"meaning": "魅力", "example": "The city has a lot of charm."},
+    "Charter": {"meaning": "憲章、貸切の", "example": "We flew on a charter flight."},
+    "Chase": {"meaning": "追いかける", "example": "The dog chased the cat up a tree."},
+    "Chatter": {"meaning": "おしゃべり", "example": "I could hear the chatter of the students."},
+    "Cheap": {"meaning": "安い", "example": "This watch was very cheap."},
+    "Cheat": {"meaning": "だます、不正をする", "example": "He cheated in the exam."},
+    "Check": {"meaning": "検査する、小切手", "example": "I'll check the results again."},
+    "Cheerful": {"meaning": "陽気な、明るい", "example": "She is always very cheerful."},
+    "Chemical": {"meaning": "化学の、化学物質", "example": "The factory produces chemical products."},
+    "Cherish": {"meaning": "大切にする、心に抱く", "example": "I cherish the memories of my childhood."},
+    "Chief": {"meaning": "主要な、最高位の", "example": "The chief problem is a lack of money."},
+    "Chill": {"meaning": "冷え、冷やす", "example": "There is a chill in the air."},
+    "Chime": {"meaning": "鐘、鳴る", "example": "I heard the church bells chime."},
+    "Chronic": {"meaning": "慢性的、長引く", "example": "He suffers from chronic back pain."},
+    "Chronicle": {"meaning": "年代記、記録する", "example": "The book chronicles the history of the city."},
+    "Circuit": {"meaning": "回路、巡回", "example": "The race is ten laps of the circuit."},
+    "Circulate": {"meaning": "循環する、配る", "example": "Blood circulates through the body."},
+    "Circumstance": {"meaning": "事情、状況", "example": "Under the circumstances, we cannot accept the offer."},
+    "Cite": {"meaning": "引用する、挙げる", "example": "He cited several examples to support his argument."},
+    "Citizen": {"meaning": "市民、国民", "example": "He is a French citizen."},
+    "Civil": {"meaning": "市民の、民間の", "example": "They are fighting for their civil rights."},
+    "Civilization": {"meaning": "文明", "example": "Ancient civilizations were very advanced."},
+    "Claim": {"meaning": "主張する、要求する", "example": "He claimed that he had seen a UFO."},
+    "Clarity": {"meaning": "明快さ、透明度", "example": "She spoke with great clarity."},
+    "Clash": {"meaning": "衝突する", "example": "The two teams clashed in the final."},
+    "Classical": {"meaning": "古典的な", "example": "I like classical music."},
+    "Classification": {"meaning": "分類", "example": "The classification of plants is complex."},
+    "Clause": {"meaning": "条項、節", "example": "There is an important clause in the contract."},
+    "Clearance": {"meaning": "許可、除去", "example": "The plane has received clearance for takeoff."},
+    "Clerk": {"meaning": "事務員、店員", "example": "He works as a clerk in a bank."},
+    "Client": {"meaning": "顧客、依頼人", "example": "The lawyer is meeting with a client."},
+    "Climate": {"meaning": "気候", "example": "The climate is getting warmer."},
+    "Cling": {"meaning": "しがみつく、固執する", "example": "The child clung to his mother's hand."},
+    "Clinic": {"meaning": "診療所、クリニック", "example": "She works at a dental clinic."},
+    "Clip": {"meaning": "クリップ、切り抜く", "example": "He clipped the article from the newspaper."},
+    "Clockwise": {"meaning": "時計回りに", "example": "Turn the key clockwise to open the door."},
+    "Clumsy": {"meaning": "不器用な", "example": "I'm very clumsy and always dropping things."},
+    "Cluster": {"meaning": "集団、群れ", "example": "There was a cluster of stars in the sky."},
+    "Coalition": {"meaning": "連合、連立", "example": "The two parties formed a coalition government."},
+    "Coarse": {"meaning": "粗い、下品な", "example": "The sand on the beach was very coarse."},
+    "Code": {"meaning": "暗号、規則", "example": "The message was written in code."},
+    "Cognitive": {"meaning": "認知の", "example": "The study looks at the cognitive development of children."},
+    "Coincidence": {"meaning": "偶然の一致", "example": "It was a coincidence that we met in London."},
+    "Collaborate": {"meaning": "協力する", "example": "The two companies are collaborating on a new project."},
+    "Collapse": {"meaning": "崩壊する、倒れる", "example": "The building collapsed during the earthquake."},
+    "Colleague": {"meaning": "同僚", "example": "I'm going to lunch with a colleague."},
+    "Collective": {"meaning": "集団の、共同の", "example": "They made a collective decision."},
+    "Collision": {"meaning": "衝突", "example": "The car was involved in a collision with a bus."},
+    "Colonial": {"meaning": "植民地の", "example": "The country was once a British colonial territory."},
+    "Column": {"meaning": "列、コラム、柱", "example": "The building has tall stone columns."},
+    "Combat": {"meaning": "戦闘、立ち向かう", "example": "The government is trying to combat crime."},
+    "Combination": {"meaning": "組み合わせ", "example": "The colors are a nice combination."},
+    "Comedy": {"meaning": "喜劇", "example": "The play is a romantic comedy."},
+    "Comfort": {"meaning": "快適さ、慰める", "example": "I like to travel in comfort."},
+    "Command": {"meaning": "命令する、指揮する", "example": "The general commanded the troops to attack."},
+    "Commemorate": {"meaning": "記念する", "example": "The statue commemorates those who died in the war."},
+    "Commence": {"meaning": "開始する", "example": "The meeting will commence at 10 o'clock."},
+    "Commend": {"meaning": "褒める", "example": "The teacher commended the student for his hard work."},
+    "Comment": {"meaning": "コメント、論評", "example": "He made a brief comment on the situation."},
+    "Commerce": {"meaning": "商業", "example": "Tokyo is a major center of commerce."},
+    "Commission": {"meaning": "委員会、手数料", "example": "The government has set up a commission to investigate the matter."},
+    "Commit": {"meaning": "犯す、委ねる、約束する", "example": "He committed a serious crime."},
+    "Commitment": {"meaning": "約束、献身", "example": "Marriage is a lifetime commitment."},
+    "Committee": {"meaning": "委員会", "example": "The committee will meet next week."},
+    "Commodity": {"meaning": "商品、日用品", "example": "Oil is an important commodity."},
+    "Common": {"meaning": "共通の、一般的な", "example": "They have many interests in common."},
+    "Commotion": {"meaning": "騒動、動揺", "example": "There was a lot of commotion in the street."},
+    "Communicate": {"meaning": "伝達する、意思疎通する", "example": "We communicate with each other by email."},
+    "Community": {"meaning": "地域社会、共同体", "example": "The local community is very supportive."},
+    "Commute": {"meaning": "通勤する", "example": "He commutes to London every day."},
+    "Compact": {"meaning": "小型の、凝縮した", "example": "The camera is very compact and easy to carry."},
+    "Companion": {"meaning": "仲間、連れ", "example": "He was my constant companion during the trip."},
+    "Company": {"meaning": "会社、仲間", "example": "I enjoy her company."},
+    "Comparable": {"meaning": "匹敵する、比較できる", "example": "The two products are comparable in quality."},
+    "Comparative": {"meaning": "比較の", "example": "The study took a comparative approach."},
+    "Compare": {"meaning": "比較する", "example": "I compared the prices of the two cars."},
+    "Compassion": {"meaning": "同情、慈悲", "example": "She felt great compassion for the poor."},
+    "Compatible": {"meaning": "互換性のある、相性がいい", "example": "The software is compatible with most computers."},
+    "Compel": {"meaning": "強制する", "example": "The weather compelled us to stay indoors."},
+    "Compensation": {"meaning": "補償、代償", "example": "He received compensation for his injuries."},
+    "Compete": {"meaning": "競争する", "example": "Many companies are competing for the contract."},
+    "Competence": {"meaning": "能力、適性", "example": "He has shown great competence in his work."},
+    "Competition": {"meaning": "競争、競技会", "example": "There is a lot of competition for the job."},
+    "Competitive": {"meaning": "競争的な、他に負けない", "example": "The company offers competitive prices."},
+    "Compile": {"meaning": "編集する、まとめる", "example": "The report was compiled from several sources."},
+    "Complain": {"meaning": "不平を言う", "example": "She complained to the manager about the service."},
+    "Complaint": {"meaning": "不平、苦情", "example": "I have a complaint about the food."},
+    "Complement": {"meaning": "補完する", "example": "The wine complements the food perfectly."},
+    "Complex": {"meaning": "複雑な、複合体", "example": "The situation is very complex."},
+    "Complexity": {"meaning": "複雑さ", "example": "The complexity of the problem is daunting."},
+    "Compliance": {"meaning": "遵守、応諾", "example": "The company is in compliance with all regulations."},
+    "Complicate": {"meaning": "複雑にする", "example": "Don't complicate things by adding more details."},
+    "Compliment": {"meaning": "褒め言葉、お世辞", "example": "He paid her a compliment on her new dress."},
+    "Component": {"meaning": "構成要素、部品", "example": "Nitrogen is a major component of air."},
+    "Compose": {"meaning": "構成する、作曲する", "example": "The committee is composed of ten members."},
+    "Composer": {"meaning": "作曲家", "example": "Mozart was a famous composer."},
+    "Composite": {"meaning": "合成の、複合の", "example": "The material is a composite of plastic and wood."},
+    "Composition": {"meaning": "構成、作品、作文", "example": "The composition of the group has changed."},
+    "Compound": {"meaning": "混合物、化合する", "example": "Water is a compound of hydrogen and oxygen."},
+    "Comprehend": {"meaning": "理解する", "example": "I cannot comprehend why he did it."},
+    "Comprehensive": {"meaning": "包括的な、理解力の", "example": "The report provides a comprehensive review of the project."},
+    "Compress": {"meaning": "圧縮する", "example": "The air is compressed in the cylinder."},
+    "Comprise": {"meaning": "〜から成る、構成する", "example": "The team comprises five members."},
+    "Compromise": {"meaning": "妥協、妥協する", "example": "We had to reach a compromise on the price."},
+    "Compulsory": {"meaning": "義務的な、必修の", "example": "Education is compulsory until the age of 16."},
+    "Conceal": {"meaning": "隠す", "example": "She tried to conceal her feelings."},
+    "Concede": {"meaning": "認める、譲歩する", "example": "He finally conceded that he was wrong."},
+    "Conceive": {"meaning": "思いつく、妊娠する", "example": "He conceived the idea for the story while traveling."},
+    "Concentrate": {"meaning": "集中する", "example": "I can't concentrate with all this noise."},
+    "Concept": {"meaning": "概念、コンセプト", "example": "The concept of time is difficult to explain."},
+    "Concern": {"meaning": "懸念、関係する", "example": "There is a lot of concern about the environment."},
+    "Concert": {"meaning": "コンサート、協調", "example": "We went to a rock concert last night."},
+    "Concession": {"meaning": "譲歩、認可", "example": "The government made several concessions to the protesters."},
+    "Concise": {"meaning": "簡潔な", "example": "The report should be as concise as possible."},
+    "Conclude": {"meaning": "結論づける、終える", "example": "The jury concluded that he was guilty."},
+    "Conclusion": {"meaning": "結論、終わり", "example": "I have come to the conclusion that he is right."},
+    "Concrete": {"meaning": "具体的な、コンクリート", "example": "We need concrete evidence to prove it."},
+    "Condemn": {"meaning": "非難する、宣告する", "example": "The government condemned the terrorist attack."},
+    "Condense": {"meaning": "凝縮する、要約する", "example": "The report was condensed into a single page."},
+    "Condition": {"meaning": "状態、条件", "example": "The car is in excellent condition."},
+    "Conduct": {"meaning": "行う、行動", "example": "The scientist conducted several experiments."},
+    "Conference": {"meaning": "会議", "example": "The conference will be held in New York."},
+    "Confess": {"meaning": "告白する", "example": "He confessed that he had stolen the money."},
+    "Confidence": {"meaning": "自信、信頼", "example": "She has a lot of confidence in her abilities."},
+    "Confident": {"meaning": "確信している、自信がある", "example": "I'm confident that we will win."},
+    "Confidential": {"meaning": "秘密の、機密の", "example": "This information is strictly confidential."},
+    "Confine": {"meaning": "制限する、閉じ込める", "example": "He was confined to bed with a fever."},
+    "Confirm": {"meaning": "確認する", "example": "Please confirm your reservation."},
+    "Conflict": {"meaning": "衝突、葛藤", "example": "There is a conflict between the two countries."},
+    "Conform": {"meaning": "従う、一致する", "example": "Students must conform to the school rules."},
+    "Confront": {"meaning": "直面する、立ち向かう", "example": "We must confront the problem together."},
+    "Confuse": {"meaning": "混乱させる", "example": "The instructions are very confusing."},
+    "Confusion": {"meaning": "混乱", "example": "There was a lot of confusion at the airport."},
+    "Congratulate": {"meaning": "祝う", "example": "I congratulated him on his success."},
+    "Congress": {"meaning": "議会、会議", "example": "The US Congress passed the law."},
+    "Conjunction": {"meaning": "結合、接続詞", "example": "The event was organized in conjunction with the local council."},
+    "Connect": {"meaning": "接続する、関連づける", "example": "The two cities are connected by a bridge."},
+    "Conscience": {"meaning": "良心", "example": "He has a guilty conscience about what he did."},
+    "Conscious": {"meaning": "意識している、意識のある", "example": "I was conscious of someone watching me."},
+    "Consecutive": {"meaning": "連続した", "example": "She won the title for three consecutive years."},
+    "Consensus": {"meaning": "合意、意見の一致", "example": "There is no consensus on the issue."},
+    "Consent": {"meaning": "同意、承諾", "example": "You need your parents' consent to go on the trip."},
+    "Consequence": {"meaning": "結果、重要さ", "example": "The consequences of the decision were serious."},
+    "Conservation": {"meaning": "保護、保存", "example": "Energy conservation is important."},
+    "Conservative": {"meaning": "保守的な、控えめな", "example": "He has very conservative views."},
+    "Consider": {"meaning": "よく考える、考慮する", "example": "We are considering moving to London."},
+    "Considerable": {"meaning": "かなりの、相当な", "example": "The project will cost a considerable amount of money."},
+    "Considerate": {"meaning": "思いやりのある", "example": "It was very considerate of you to help."},
+    "Consist": {"meaning": "成る、ある", "example": "The team consists of five players."},
+    "Consistent": {"meaning": "一貫した、一致する", "example": "His results have been very consistent."},
+    "Consolidate": {"meaning": "強化する、合併する", "example": "The company is trying to consolidate its position in the market."},
+    "Conspicuous": {"meaning": "目立つ、顕著な", "example": "He was conspicuous by his absence."},
+    "Constant": {"meaning": "絶え間ない、一定の", "example": "The noise was constant throughout the night."},
+    "Constituent": {"meaning": "構成要素、有権者", "example": "Brake is a constituent part of a car."},
+    "Constitute": {"meaning": "構成する、制定する", "example": "This constitutes a serious threat to our safety."},
+    "Constitution": {"meaning": "憲法、構成", "example": "The US Constitution was written in 1787."},
+    "Constraint": {"meaning": "制約、束縛", "example": "There are several constraints on our budget."},
+    "Construct": {"meaning": "建設する、組み立てる", "example": "The bridge was constructed in 1930."},
+    "Consult": {"meaning": "相談する、参照する", "example": "You should consult a doctor."},
+    "Consume": {"meaning": "消費する、食べ尽くす", "example": "The car consumes a lot of fuel."},
+    "Consumer": {"meaning": "消費者", "example": "Consumer demand for electric cars is increasing."},
+    "Consumption": {"meaning": "消費", "example": "The consumption of alcohol is prohibited here."},
+    "Contact": {"meaning": "接触、連絡する", "example": "Please contact me if you have any questions."},
+    "Contain": {"meaning": "含む、抑える", "example": "This bottle contains water."},
+    "Contaminate": {"meaning": "汚染する", "example": "The water was contaminated with chemicals."},
+    "Contemplate": {"meaning": "熟考する、期待する", "example": "She is contemplating moving to another country."},
+    "Contemporary": {"meaning": "現代の、同時代の", "example": "I like contemporary art."},
+    "Contempt": {"meaning": "軽蔑", "example": "He showed a complete contempt for the law."},
+    "Contend": {"meaning": "主張する、競う", "example": "The company contends that the product is safe."},
+    "Content": {"meaning": "内容、満足している", "example": "I am content with my life."},
+    "Contest": {"meaning": "競技会、争う", "example": "She won the beauty contest."},
+    "Context": {"meaning": "文脈、背景", "example": "You need to look at the word in context."},
+    "Continent": {"meaning": "大陸", "example": "Asia is the largest continent."},
+    "Continual": {"meaning": "断続的な、繰り返される", "example": "I'm tired of your continual complaints."},
+    "Continuous": {"meaning": "途切れることのない", "example": "The brain needs a continuous supply of blood."},
+    "Contract": {"meaning": "契約、収縮する", "example": "We signed a contract for the new house."},
+    "Contradict": {"meaning": "矛盾する、反論する", "example": "His actions contradict his words."},
+    "Contrary": {"meaning": "反対の", "example": "Contrary to expectations, the team won."},
+    "Contrast": {"meaning": "対照、対比させる", "example": "There is a sharp contrast between the two brothers."},
+    "Contribute": {"meaning": "貢献する、寄付する", "example": "He contributed a lot of money to the project."},
+    "Contribution": {"meaning": "貢献、寄付", "example": "She made a significant contribution to the study."},
+    "Control": {"meaning": "制御する、管理", "example": "He lost control of the car."},
+    "Controversial": {"meaning": "論争を呼ぶ", "example": "The new law is very controversial."},
+    "Controversy": {"meaning": "論争", "example": "The decision caused a lot of controversy."},
+    "Convenience": {"meaning": "便利さ、都合", "example": "Please come at your earliest convenience."},
+    "Convention": {"meaning": "慣習、大会、協定", "example": "It is a social convention to say 'please'."},
+    "Conventional": {"meaning": "従来の、型にはまった", "example": "He has a conventional approach to management."},
+    "Converge": {"meaning": "集中する、一点に集まる", "example": "The two roads converge at the city center."},
+    "Conversation": {"meaning": "会話", "example": "I had an interesting conversation with him."},
+    "Convert": {"meaning": "変換する、変える", "example": "The sofa converts into a bed."},
+    "Convey": {"meaning": "伝える、運ぶ", "example": "Words cannot convey my gratitude."},
+    "Convict": {"meaning": "有罪を宣告する、受刑者", "example": "He was convicted of murder."},
+    "Conviction": {"meaning": "確信、有罪判決", "example": "She spoke with deep conviction."},
+    "Convince": {"meaning": "納得させる、確信させる", "example": "I managed to convince him to join us."},
+    "Cooperate": {"meaning": "協力する", "example": "The two countries are cooperating on the project."},
+    "Coordinate": {"meaning": "調整する、同調させる", "example": "We need to coordinate our efforts."},
+    "Cope": {"meaning": "うまく対処する", "example": "I don't know how she copes with all that stress."},
+    "Copper": {"meaning": "銅", "example": "The coins are made of copper."},
+    "Core": {"meaning": "核心、芯", "example": "The core problem is a lack of communication."},
+    "Corporate": {"meaning": "企業の、法人の", "example": "The company has a strong corporate image."},
+    "Corporation": {"meaning": "株式会社、大企業", "example": "He works for a multinational corporation."},
+    "Correlate": {"meaning": "相関する", "example": "The results of the two studies correlate well."},
+    "Correspond": {"meaning": "一致する、文通する", "example": "The two versions of the story do not correspond."},
+    "Correspondence": {"meaning": "文通、一致", "example": "I have a lot of correspondence to deal with."},
+    "Corrupt": {"meaning": "腐敗した、汚職の", "example": "The government was accused of being corrupt."},
+    "Cosmic": {"meaning": "宇宙の", "example": "Cosmic rays come from outer space."},
+    "Cosmopolitan": {"meaning": "国際的な", "example": "London is a very cosmopolitan city."},
+    "Costly": {"meaning": "高価な、損失の大きい", "example": "The project proved to be very costly."},
+    "Council": {"meaning": "評議会、議会", "example": "The local council is planning to build a new library."},
+    "Counsel": {"meaning": "助言、弁護士", "example": "He sought counsel from his lawyer."},
+    "Counter": {"meaning": "対抗する、カウンター", "example": "The government has introduced measures to counter inflation."},
+    "Counterfeit": {"meaning": "偽造の、偽物", "example": "He was arrested for using counterfeit money."},
+    "Counterpart": {"meaning": "対応する人、対照物", "example": "The Japanese Prime Minister met his Chinese counterpart."},
+    "Countless": {"meaning": "数え切れない", "example": "There are countless stars in the sky."},
+    "Courage": {"meaning": "勇気", "example": "It took a lot of courage to tell the truth."},
+    "Course": {"meaning": "過程、コース、進路", "example": "The ship changed course."},
+    "Courtesy": {"meaning": "礼儀", "example": "He treated everyone with courtesy."},
+    "Coverage": {"meaning": "報道、補償範囲", "example": "There was a lot of media coverage of the event."},
+    "Coward": {"meaning": "臆病者", "example": "He is a coward and afraid of his own shadow."},
+    "Crack": {"meaning": "ひび、割れる", "example": "There is a crack in the window."},
+    "Craft": {"meaning": "工芸、技術", "example": "He is a master of his craft."},
+    "Crash": {"meaning": "衝突する、墜落する", "example": "The car crashed into a tree."},
+    "Crawler": {"meaning": "這うもの、クローラー", "example": "The spider is a creepy crawler."},
+    "Creativity": {"meaning": "創造性", "example": "We need someone with creativity for this job."},
+    "Credential": {"meaning": "実績、証明書", "example": "She has impressive academic credentials."},
+    "Credible": {"meaning": "信頼できる", "example": "His story is not very credible."},
+    "Credit": {"meaning": "信用、功績", "example": "He deserves credit for his hard work."},
+    "Creep": {"meaning": "這う、忍び寄る", "example": "The cat crept slowly toward the bird."},
+    "Criminal": {"meaning": "犯人、犯罪の", "example": "The police are looking for the criminal."},
+    "Crisis": {"meaning": "危機", "example": "The company is facing a financial crisis."},
+    "Criterion": {"meaning": "基準", "example": "What is the main criterion for the job?"},
+    "Critic": {"meaning": "批評家", "example": "The film received good reviews from the critics."},
+    "Critical": {"meaning": "批判的な、重大な", "example": "The report was highly critical of the government."},
+    "Criticism": {"meaning": "批判", "example": "The plan has met with a lot of criticism."},
+    "Criticize": {"meaning": "批判する", "example": "He was criticized for his lack of experience."},
+    "Crop": {"meaning": "作物、収穫量", "example": "The farmers are harvesting the crops."},
+    "Crowd": {"meaning": "群衆", "example": "There was a large crowd at the stadium."},
+    "Crucial": {"meaning": "決定的な、重要な", "example": "The next few days will be crucial for the project."},
+    "Crude": {"meaning": "生の、粗野な", "example": "The country exports crude oil."},
+    "Cruel": {"meaning": "残酷な", "example": "It was cruel of him to say that."},
+    "Cruise": {"meaning": "巡航、船旅", "example": "We went on a cruise around the Mediterranean."},
+    "Crush": {"meaning": "押しつぶす", "example": "The car was crushed in the accident."},
+    "Crystal": {"meaning": "水晶、結晶", "example": "The water was crystal clear."},
+    "Cultivate": {"meaning": "耕す、育てる", "example": "She is trying to cultivate a more professional image."},
+    "Cultural": {"meaning": "文化の", "example": "The city has a rich cultural heritage."},
+    "Culture": {"meaning": "文化", "example": "I'm interested in Japanese culture."},
+    "Cunning": {"meaning": "狡猾な、ずるい", "example": "He is as cunning as a fox."},
+    "Cure": {"meaning": "治療する、治癒", "example": "Doctors are still looking for a cure for cancer."},
+    "Curiosity": {"meaning": "好奇心", "example": "Children have a lot of curiosity."},
+    "Curious": {"meaning": "好奇心の強い、奇妙な", "example": "I'm curious to know what happened."},
+    "Currency": {"meaning": "通貨", "example": "The dollar is the world's main currency."},
+    "Current": {"meaning": "現在の、流れ", "example": "What is your current address?"},
+    "Curriculum": {"meaning": "カリキュラム", "example": "The school curriculum includes several languages."},
+    "Curse": {"meaning": "呪い、ののしる", "example": "The witch put a curse on the prince."},
+    "Custody": {"meaning": "親権、保管、拘留", "example": "The mother was granted custody of the child."},
+    "Custom": {"meaning": "習慣", "example": "It is the custom here to take off your shoes."},
+    "Customer": {"meaning": "顧客", "example": "The shop was full of customers."},
+    "Customs": {"meaning": "税関", "example": "We had to go through customs at the airport."},
+    "Cynical": {"meaning": "冷笑的な", "example": "He has a cynical view of politics."},
 }
 
+# --- 以下のロジック部分は変更なし ---
 # 2. セッション状態の初期化
-if 'current_word' not in st.session_state:
+if 'word_queue' not in st.session_state:
+    st.session_state.word_queue = list(EIKEN_PRE1_DATA.keys()) # 未回答リスト
+    random.shuffle(st.session_state.word_queue)
+    st.session_state.review_list = [] # 復習用リスト
     st.session_state.current_word = None
     st.session_state.options = []
     st.session_state.score = 0
     st.session_state.total = 0
     st.session_state.answered = False
     st.session_state.feedback = ""
+    st.session_state.is_review_mode = False
 
 def next_question():
-    word = random.choice(list(EIKEN_PRE1_DATA.keys()))
+    if not st.session_state.word_queue:
+        if st.session_state.review_list:
+            st.session_state.word_queue = list(st.session_state.review_list)
+            st.session_state.review_list = []
+            st.session_state.is_review_mode = True
+            random.shuffle(st.session_state.word_queue)
+        else:
+            st.session_state.current_word = "FINISHED"
+            return
+
+    word = st.session_state.word_queue.pop(0)
     correct_ans = EIKEN_PRE1_DATA[word]["meaning"]
     
-    # 全ての意味リストから正解以外を抽出
     others = [info["meaning"] for w, info in EIKEN_PRE1_DATA.items() if w != word]
     wrong_answers = random.sample(others, 3)
     
@@ -79,65 +546,71 @@ def next_question():
     st.session_state.answered = False
     st.session_state.feedback = ""
 
-# 初回起動時
 if st.session_state.current_word is None:
     next_question()
 
 # 3. UI構成
-st.set_page_config(page_title="Eiken Pre-1 Quiz", page_icon="📝")
-st.title("📝 英検準1級 単語チャレンジ")
+st.set_page_config(page_title="Eiken Pre-1 Pro", page_icon="🎓")
+st.title("🎓 英検準1級 特訓モード (約400語収録)")
 
-# サイドバー
-st.sidebar.header("📊 学習進捗")
-accuracy = (st.session_state.score / st.session_state.total * 100) if st.session_state.total > 0 else 0
+st.sidebar.header("📊 学習データ")
 st.sidebar.metric("正解数", f"{st.session_state.score} / {st.session_state.total}")
-st.sidebar.progress(min(accuracy / 100, 1.0))
-st.sidebar.write(f"正答率: **{accuracy:.1f}%**")
+st.sidebar.write(f"残り問題数: {len(st.session_state.word_queue)}")
+st.sidebar.write(f"復習待ち: {len(st.session_state.review_list)} 語")
+if st.session_state.is_review_mode:
+    st.sidebar.warning("🔥 復習モード実施中")
 
 st.write("---")
-st.info(f"次の単語の意味を選んでください:  \n# **{st.session_state.current_word}**", icon="🧐")
 
-# 4. 回答処理ロジック
-def handle_answer(selected_option):
-    st.session_state.answered = True
-    st.session_state.total += 1
-    correct_ans = EIKEN_PRE1_DATA[st.session_state.current_word]["meaning"]
-    
-    if selected_option == correct_ans:
-        st.session_state.score += 1
-        st.session_state.feedback = ("success", f"🎯 **正解！**")
-    else:
-        st.session_state.feedback = ("error", f"⚠️ **不正解...** 正解は「**{correct_ans}**」でした。")
-
-# 選択肢の表示
-col1, col2 = st.columns(2)
-for i, option in enumerate(st.session_state.options):
-    target_col = col1 if i % 2 == 0 else col2
-    if target_col.button(option, key=f"btn_{i}", use_container_width=True, disabled=st.session_state.answered):
-        handle_answer(option)
-        st.rerun()
-
-# フィードバックと例文の表示
-if st.session_state.answered:
-    fb_type, fb_msg = st.session_state.feedback
-    if fb_type == "success":
-        st.success(fb_msg)
-    else:
-        st.error(fb_msg)
-    
-    # 例文セクションの追加
-    with st.expander("📖 この単語の例文を見る", expanded=True):
-        st.markdown(f"**Example:**")
-        st.info(EIKEN_PRE1_DATA[st.session_state.current_word]["example"])
-        
-    if st.button("次の問題へ進む ⏩", use_container_width=True):
-        next_question()
-        st.rerun()
-
-# 設定
-with st.sidebar.expander("システム設定"):
-    if st.button("進捗をリセットする"):
+if st.session_state.current_word == "FINISHED":
+    st.balloons()
+    st.success("全ての単語をマスターしました！")
+    if st.button("最初からやり直す"):
+        st.session_state.word_queue = list(EIKEN_PRE1_DATA.keys())
+        st.session_state.review_list = []
         st.session_state.score = 0
         st.session_state.total = 0
+        st.session_state.is_review_mode = False
         next_question()
         st.rerun()
+else:
+    st.info(f"次の単語の意味を選んでください:  \n# **{st.session_state.current_word}**", icon="🧐")
+
+    def handle_answer(selected_option):
+        st.session_state.answered = True
+        st.session_state.total += 1
+        word = st.session_state.current_word
+        correct_ans = EIKEN_PRE1_DATA[word]["meaning"]
+        
+        if selected_option == correct_ans:
+            st.session_state.score += 1
+            st.session_state.feedback = ("success", f"🎯 **正解！**")
+        else:
+            st.session_state.feedback = ("error", f"⚠️ **不正解...** 正解は「**{correct_ans}**」")
+            if word not in st.session_state.review_list:
+                st.session_state.review_list.append(word)
+
+    col1, col2 = st.columns(2)
+    for i, option in enumerate(st.session_state.options):
+        target_col = col1 if i % 2 == 0 else col2
+        if target_col.button(option, key=f"btn_{i}", use_container_width=True, disabled=st.session_state.answered):
+            handle_answer(option)
+            st.rerun()
+
+    if st.session_state.answered:
+        fb_type, fb_msg = st.session_state.feedback
+        if fb_type == "success":
+            st.success(fb_msg)
+        else:
+            st.error(fb_msg)
+        
+        with st.expander("📖 例文を確認", expanded=True):
+            st.info(EIKEN_PRE1_DATA[st.session_state.current_word]["example"])
+            
+        if st.button("次の問題へ進む ⏩", use_container_width=True):
+            next_question()
+            st.rerun()
+
+if st.sidebar.button("進捗をリセット"):
+    st.session_state.clear()
+    st.rerun()
